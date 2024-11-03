@@ -1,4 +1,16 @@
 theese are just my notes, dont mind:
+# tricks
+## Tmux:
+accidentally closed tmux terminal
+```
+tmux ls
+tmux attach-session -t <session name>
+```
+or when there is only one session:
+```
+tmux attach
+```
+# Hacking
 ## Fuzzing:
 ```
 ffuf -w <wordlist> -H "Host: <FUZZ.example.com>" -u http://<IP> -fw <words>
@@ -24,4 +36,8 @@ dig @<DNS_server_IP> <example.com> AXFR
 ## WinRm:
 ```
 evil-winrm -i <IP> -u <username> -p'<password>'
+```
+## LDAP:
+```
+nxc ldap <IP> -d <Domain> -u '<username>' -p '<password>' -M group-mem -o group='Remote Management Users'
 ```
