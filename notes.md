@@ -1,5 +1,15 @@
 theese are just my notes, dont mind:
 # tricks
+## Virutal Environment:
+activate:
+```
+python -m venv venv
+.\venv\Scripts\activate
+```
+end:
+```
+deactivate
+```
 ## Tmux:
 accidentally closed tmux terminal
 ```
