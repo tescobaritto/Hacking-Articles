@@ -137,5 +137,48 @@ Plaintext passwords (if they are cached or available in memory).
 NTLM hashes (which can be used for further attacks like Pass-the-Hash).
 Kerberos tickets (useful for Kerberos-based attacks like Golden Ticket or Silver Ticket attacks).
 4. Kerberos Ticket Extraction: Mimikatz can extract Kerberos tickets (TGTs and service tickets) from memory, enabling attackers to impersonate users and access network resources, especially if they have Kerberos keys or can forge tickets.
+## Golden Ticket Attack 
+A Golden Ticket attack is a powerful method used to gain long-term access to an Active Directory (AD) environment. It leverages Kerberos authentication by forging valid Kerberos Ticket-Granting Tickets (TGTs). These forged tickets allow attackers to impersonate any user, including domain admins, and access virtually any resource in the domain.
+### How Golden Ticket Attack Work:
+1. Prerequisites:                                                                     
+    - The attacker needs the KRBTGT account's NTLM hash from the domain controller (DC).
+    - Access to a tool like Mimikatz to craft the ticket.
+2. Forging the Ticket:                                                                   
+    - Mimikatz is used to create a fake TGT using the KRBTGT hash.
+    - This fake TGT is cryptographically valid and will be accepted by the domain controller as authentic.
+3. Using the Golden Ticket:                                                           
+    - The attacker can impersonate any user, including high-privilege accounts like domain admins.
+    - They gain unrestricted access to AD resources, such as file shares, databases, and sensitive systems.
+4. Persistence:                                               
+    - Since the KRBTGT account's hash rarely changes, the attacker can maintain access indefinitely unless the hash is rotated twice (recommended for mitigation).
+### Mitigation Steps:
+1. Rotate the KRBTGT Account Key:
+   - Perform a double reset of the KRBTGT account password to invalidate forged tickets. Follow Microsoft's guidelines for securely rotating this account.
+
+2. Implement Least Privilege:
+   - Restrict the use of domain admin accounts and limit their exposure.
+3. Enable LSA Protection:
+   - Protect LSASS (Local Security Authority Subsystem Service) to prevent credential dumping.
+4. Secure Domain Controllers:
+   - Apply strict access controls and ensure DCs are patched and isolated from less secure network segments.
+## Silver Ticket Attack
+A Silver Ticket attack involves forging a Kerberos Service Ticket (TGS) to gain unauthorized access to a specific service within the domain, such as SQL Server or file shares. Unlike Golden Tickets, Silver Tickets use the hash of a service account (e.g., svc_sql) instead of the KRBTGT hash and are harder to detect due to bypassing domain controller logging.
+# Additional Things
+## ZeroLogon
+A Zerologon attack exploits a critical vulnerability in the Netlogon protocol (CVE-2020-1472) to reset the domain controller's machine account password. This grants attackers full domain admin privileges, enabling complete control over the domain. However, running this attack can destabilize the domain controller, potentially corrupting or deleting the entire domain, making it highly dangerous to execute.
+## A PrintNightmare
+A PrintNightmare attack (CVE-2021-34527) exploits vulnerabilities in the Windows Print Spooler service, allowing attackers to achieve remote code execution or escalate privileges to SYSTEM. By exploiting improper privilege checks during printer driver installations, an attacker can execute arbitrary code or perform lateral movement. This makes it a critical vulnerability often used to gain full control over Windows systems.
+### Detection 
+To detect vulnerability simply run this command in terminal using rpcdump:
+```
+rpcdump.py @<IP> | egrep 'MS-RPRN|MS-PAR'
+```
+
+![image](https://github.com/user-attachments/assets/a9ff68e7-5985-44c9-8c5f-f0d15806ae4c)
+
+If output is like shown on screen machine is vulnerable
+## EvilCups
+I will write about this vulnerability in detail in another post but for now brief overwiew and also this is added by me becouse it is recent and wasnt included in TCM course.
+EvilCups targets misconfigured CUPS servers to send malicious print jobs that can lead to unauthorized access or remote code execution. The attack exploits poor access controls in CUPS, often on Linux/Unix systems, allowing attackers to inject payloads. To mitigate, restrict access to trusted IPs, enable authentication, and regularly update CUPS.                                     
 
 Thats all for now thanks for attention to the one person that is reading this.
